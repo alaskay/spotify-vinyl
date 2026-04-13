@@ -3,6 +3,7 @@ import { Home as HomeIcon, Search, Library, Settings, LogOut, Plus, User } from 
 import { logout } from '@/services/spotify-auth'
 import { fetchCurrentUser } from '@/services/spotify-api'
 import { useAppStore } from '@/store/useAppStore'
+import Shelf from '@/components/Shelf'
 
 const NAV_ITEMS = [
   { name: 'My Shelf',  icon: HomeIcon },
@@ -13,8 +14,11 @@ const NAV_ITEMS = [
 
 export default function Home() {
   const [activeNav, setActiveNav] = useState<string>('My Shelf')
-  const spotifyUser = useAppStore((s) => s.spotifyUser)
+  const [_searchOpen, setSearchOpen] = useState(false)
+
+  const spotifyUser  = useAppStore((s) => s.spotifyUser)
   const setSpotifyUser = useAppStore((s) => s.setSpotifyUser)
+  const shelfAlbums  = useAppStore((s) => s.shelfAlbums)
 
   useEffect(() => {
     if (!spotifyUser) {
@@ -22,57 +26,45 @@ export default function Home() {
     }
   }, [spotifyUser, setSpotifyUser])
 
-  const avatarUrl = spotifyUser?.images?.[0]?.url
+  const avatarUrl   = spotifyUser?.images?.[0]?.url
   const displayName = spotifyUser?.display_name ?? '…'
-  const handle = spotifyUser?.email ?? ''
+  const handle      = spotifyUser?.email ?? ''
 
   return (
     <div
-      className="size-full flex overflow-hidden relative"
-      style={{ fontFamily: "'Space Mono', monospace" }}
+      style={{ display: 'flex', width: '100vw', height: '100vh', overflow: 'hidden', fontFamily: "'Space Mono', monospace" }}
     >
-      {/* ── Background ── */}
-      <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{
-          backgroundImage: "url('/background.jpg')",
-          filter: 'blur(20px)',
-          transform: 'scale(1.1)',
-        }}
-      />
-      <div
-        className="absolute inset-0"
-        style={{ backgroundColor: 'rgba(26, 26, 31, 0.55)' }}
-      />
-
       {/* ── Sidebar ── */}
-      <aside
-        className="relative z-10 flex flex-col h-full"
-        style={{
-          width: '260px',
-          backgroundColor: 'rgba(34, 34, 42, 0.6)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          borderRight: '1px solid rgba(255, 255, 255, 0.08)',
-        }}
-      >
+      <aside style={{
+        width: '260px',
+        flexShrink: 0,
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        backgroundColor: '#22222A',
+        borderRight: '1px solid rgba(255,255,255,0.07)',
+      }}>
         {/* User profile */}
-        <div className="p-6 pb-8">
-          <div className="flex items-center gap-3 mb-6">
-            <div
-              className="rounded-full flex-shrink-0 overflow-hidden flex items-center justify-center"
-              style={{ width: '48px', height: '48px', backgroundColor: '#FF4D8F' }}
-            >
+        <div style={{ padding: '24px 24px 32px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{
+              width: '48px', height: '48px',
+              borderRadius: '50%',
+              backgroundColor: '#FF4D8F',
+              flexShrink: 0,
+              overflow: 'hidden',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
               {avatarUrl
                 ? <img src={avatarUrl} alt={displayName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 : <User size={24} color="#F0EEF5" />
               }
             </div>
-            <div className="flex-1 min-w-0">
-              <div className="font-bold text-base truncate" style={{ color: '#F0EEF5' }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontWeight: 700, fontSize: '14px', color: '#F0EEF5', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {displayName}
               </div>
-              <div className="text-sm truncate" style={{ color: '#6B6880' }}>
+              <div style={{ fontSize: '12px', color: '#6B6880', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {handle}
               </div>
             </div>
@@ -80,114 +72,119 @@ export default function Home() {
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 px-3">
+        <nav style={{ flex: 1, padding: '0 12px' }}>
           {NAV_ITEMS.map(({ name, icon: Icon }) => {
             const isActive = activeNav === name
             return (
               <button
                 key={name}
                 onClick={() => setActiveNav(name)}
-                className="w-full flex items-center gap-3 px-3 py-3 mb-1 rounded-lg transition-all"
                 style={{
-                  backgroundColor: isActive ? 'rgba(255, 255, 255, 0.05)' : 'transparent',
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '10px 12px',
+                  marginBottom: '4px',
+                  borderRadius: '8px',
+                  backgroundColor: isActive ? 'rgba(255,255,255,0.05)' : 'transparent',
                   borderLeft: isActive ? '3px solid #FF4D8F' : '3px solid transparent',
                   color: isActive ? '#F0EEF5' : '#6B6880',
                   cursor: 'pointer',
+                  border: 'none',
+                  borderLeftWidth: '3px',
+                  borderLeftStyle: 'solid',
+                  borderLeftColor: isActive ? '#FF4D8F' : 'transparent',
+                  fontFamily: "'Space Mono', monospace",
+                  fontSize: '13px',
+                  transition: 'background 0.15s, color 0.15s',
                 }}
               >
                 <Icon size={18} />
-                <span className="text-sm">{name}</span>
+                {name}
               </button>
             )
           })}
         </nav>
 
         {/* Sign out */}
-        <div className="p-4">
+        <div style={{ padding: '16px' }}>
           <button
             onClick={logout}
-            className="flex items-center gap-2 text-sm transition-opacity hover:opacity-80"
-            style={{ color: '#FF4D8F', cursor: 'pointer', background: 'none', border: 'none' }}
+            style={{
+              display: 'flex', alignItems: 'center', gap: '8px',
+              fontSize: '13px', color: '#FF4D8F',
+              background: 'none', border: 'none', cursor: 'pointer',
+              fontFamily: "'Space Mono', monospace",
+              opacity: 1, transition: 'opacity 0.2s',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.7' }}
+            onMouseLeave={(e) => { e.currentTarget.style.opacity = '1' }}
           >
             <LogOut size={16} />
-            <span>Sign out</span>
+            Sign out
           </button>
         </div>
       </aside>
 
       {/* ── Main content ── */}
-      <main className="relative z-10 flex-1 flex flex-col p-12 overflow-auto">
+      <main style={{
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        backgroundColor: '#F5F0E8',
+        overflowY: 'auto',
+      }}>
         {/* Header */}
-        <div className="mb-12">
-          <h1
-            className="font-bold mb-2"
-            style={{
-              fontFamily: "'Playfair Display', serif",
-              fontStyle: 'italic',
-              fontSize: '40px',
-              color: '#F0EEF5',
-            }}
-          >
-            Welcome back{spotifyUser ? `, ${displayName.split(' ')[0]}` : ''}
+        <div style={{ padding: '48px 48px 40px' }}>
+          <h1 style={{
+            fontFamily: "'Playfair Display', serif",
+            fontStyle: 'italic',
+            fontWeight: 700,
+            fontSize: '38px',
+            color: '#2A2118',
+            margin: '0 0 6px',
+            lineHeight: 1.1,
+          }}>
+            {spotifyUser ? `Welcome back, ${displayName.split(' ')[0]}` : 'Your Shelf'}
           </h1>
-          <p className="text-sm" style={{ color: '#6B6880' }}>
-            Your vinyl shelf is waiting
+          <p style={{ fontFamily: "'Space Mono', monospace", fontSize: '11px', color: '#9A8060', letterSpacing: '0.1em', textTransform: 'uppercase', margin: 0 }}>
+            {shelfAlbums.length === 0
+              ? 'no records yet'
+              : `${shelfAlbums.length} record${shelfAlbums.length !== 1 ? 's' : ''} on your shelf`
+            }
           </p>
         </div>
 
-        {/* Vinyl shelf */}
-        <div className="flex-1 flex items-center justify-center">
-          <div className="w-full max-w-4xl">
-            <div
-              className="relative h-32 rounded-lg overflow-hidden"
-              style={{
-                background: 'linear-gradient(180deg, #2A2520 0%, #1F1B17 100%)',
-                boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.3), 0 4px 12px rgba(0,0,0,0.5)',
-              }}
-            >
-              {/* Wood grain */}
-              <div
-                className="absolute inset-0 opacity-20"
-                style={{
-                  backgroundImage: `repeating-linear-gradient(
-                    90deg,
-                    transparent,
-                    transparent 2px,
-                    rgba(0,0,0,0.1) 2px,
-                    rgba(0,0,0,0.1) 4px
-                  )`,
-                }}
-              />
-
-              {/* Empty state */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div
-                  className="rounded-lg px-8 py-6 text-center"
-                  style={{
-                    border: '2px dashed rgba(255,255,255,0.15)',
-                  }}
-                >
-                  <p className="text-sm" style={{ color: '#6B6880' }}>
-                    Add your first record
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
+        {/* Shelf */}
+        <div style={{ flex: 1, padding: '0 48px 120px' }}>
+          <Shelf albums={shelfAlbums} onAddClick={() => setSearchOpen(true)} />
         </div>
       </main>
 
       {/* ── FAB ── */}
       <button
-        className="fixed bottom-8 right-8 rounded-full flex items-center justify-center transition-all hover:scale-105"
+        onClick={() => setSearchOpen(true)}
         style={{
+          position: 'fixed',
+          bottom: '32px',
+          right: '32px',
           width: '56px',
           height: '56px',
+          borderRadius: '50%',
           background: 'linear-gradient(135deg, #FF4D8F 0%, #E8458A 100%)',
-          boxShadow: '0 4px 16px rgba(255,77,143,0.4)',
+          boxShadow: '0 4px 16px rgba(255,77,143,0.45)',
           border: 'none',
           cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          transition: 'transform 0.2s, box-shadow 0.2s',
+          zIndex: 20,
         }}
+        onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.08)'; e.currentTarget.style.boxShadow = '0 6px 24px rgba(255,77,143,0.6)' }}
+        onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 4px 16px rgba(255,77,143,0.45)' }}
       >
         <Plus size={24} color="#F0EEF5" strokeWidth={2.5} />
       </button>
