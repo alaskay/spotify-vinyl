@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { redirectToSpotifyAuth } from '@/services/spotify-auth'
 
 export default function Login() {
   const [loading, setLoading] = useState(false)
@@ -11,7 +12,7 @@ export default function Login() {
 
   function handleLogin() {
     setLoading(true)
-    // TODO M1: redirecionar para o Spotify OAuth
+    redirectToSpotifyAuth().catch(() => setLoading(false))
   }
 
   return (
