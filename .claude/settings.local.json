@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc:*)",
+      "Read(//c/Users/y007/Desktop/**)",
+      "Bash(unzip -o \"Logged-in Home Screen.zip\" -d \"Logged-in Home Screen\")",
+      "Bash(node -e \"const p = require\\(''./package.json''\\); console.log\\(JSON.stringify\\({...p.dependencies, ...p.devDependencies}, null, 2\\)\\)\")",
+      "Bash(npm install:*)"
+    ]
+  }
+}
