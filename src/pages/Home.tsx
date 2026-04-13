@@ -4,6 +4,7 @@ import { logout } from '@/services/spotify-auth'
 import { fetchCurrentUser } from '@/services/spotify-api'
 import { useAppStore } from '@/store/useAppStore'
 import Shelf from '@/components/Shelf'
+import SearchModal from '@/components/SearchModal'
 
 const NAV_ITEMS = [
   { name: 'My Shelf',  icon: HomeIcon },
@@ -14,7 +15,7 @@ const NAV_ITEMS = [
 
 export default function Home() {
   const [activeNav, setActiveNav] = useState<string>('My Shelf')
-  const [_searchOpen, setSearchOpen] = useState(false)
+  const [searchOpen, setSearchOpen] = useState(false)
 
   const spotifyUser  = useAppStore((s) => s.spotifyUser)
   const setSpotifyUser = useAppStore((s) => s.setSpotifyUser)
@@ -25,6 +26,18 @@ export default function Home() {
       fetchCurrentUser().then(setSpotifyUser).catch(() => undefined)
     }
   }, [spotifyUser, setSpotifyUser])
+
+  // Cmd/Ctrl+K global shortcut
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault()
+        setSearchOpen((o) => !o)
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
 
   const avatarUrl   = spotifyUser?.images?.[0]?.url
   const displayName = spotifyUser?.display_name ?? '…'
@@ -162,6 +175,9 @@ export default function Home() {
           <Shelf albums={shelfAlbums} onAddClick={() => setSearchOpen(true)} />
         </div>
       </main>
+
+      {/* ── Search modal ── */}
+      <SearchModal isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
 
       {/* ── FAB ── */}
       <button
