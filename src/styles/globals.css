@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* ─── Cores góticas ────────────────────────────────────── */
+  --color-base:     #1A1A1F; /* fundo principal — grafite escuro */
+  --color-surface:  #22222A; /* cards, modais, superfícies */
+  --color-elevated: #2C2C38; /* elementos elevados, hover states */
+  --color-border:   #3A3A4A; /* bordas sutis */
+
+  --color-pink:     #FF4D8F; /* destaque principal — rosa neon */
+  --color-purple:   #4A1A6E; /* destaque secundário — roxo profundo */
+  --color-white:    #F0EEF5; /* texto principal — levemente frio */
+  --color-muted:    #6B6880; /* texto secundário, labels */
+  --color-spotify:  #1DB954; /* mantém — verde Spotify */
+
+  /* ─── Tipografia ───────────────────────────────────────── */
+  --font-gothic:  'UnifrakturMaguntia', cursive; /* logo, títulos, nome do álbum */
+  --font-body:    'Space Mono', monospace;        /* toda a UI, labels, botões */
+
+  /* ─── Border radius ────────────────────────────────────── */
+  --radius-disc: 50%;  /* disco sempre circular */
+  --radius-card: 6px;  /* cards com canto quase reto — mais agressivo */
+
+  /* ─── Animações ────────────────────────────────────────── */
+  --transition-base:        200ms ease-out;
+  --anim-disc-to-turntable: 900ms cubic-bezier(.4,0,.2,1);
+
+  /* ─── Sombras ──────────────────────────────────────────── */
+  --shadow-disc-hover: 0 12px 40px rgba(255,77,143,.2); /* glow rosa no hover */
+  --shadow-pink-glow:  0 0 20px rgba(255,77,143,.3);    /* glow decorativo */
+}
+
+/* ─── Base global ──────────────────────────────────────────── */
+body {
+  background-color: var(--color-base);
+  color: var(--color-white);
+  font-family: var(--font-body);
+}
