@@ -24,7 +24,7 @@ export default function Home() {
 
   const avatarUrl = spotifyUser?.images?.[0]?.url
   const displayName = spotifyUser?.display_name ?? '…'
-  const handle = spotifyUser ? `@${spotifyUser.id}` : ''
+  const handle = spotifyUser?.email ?? ''
 
   return (
     <div
